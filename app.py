@@ -1,67 +1,89 @@
 import random 
 import string
 from tkinter import *
-from tkinter import Tk
+import clipboard
+from tkinter import ttk
 
 root = Tk()
-root.title("Password Generator")
-root.geometry("400x200")
+root.title("Password Manager")
+root.geometry("400x300")
+tabControl = ttk.Notebook(root)
+
+tab1 = ttk.Frame(tabControl)
+tab2 = ttk.Frame(tabControl)
+  
+tabControl.add(tab1, text ='Password Manager')
+tabControl.add(tab2, text ='Password Generator')
+tabControl.pack(expand = 1, fill ="both")
 
 v = IntVar()
 t = IntVar()
 c = IntVar()
 r = IntVar()
-a = 1
+rr = []
+result = ""
+save = []
+f = open("passwords.psdw", "a")
+rrr = open("passwords.psdw", "r")
 
-c1 = Checkbutton(root, text='lowercase',variable = t, onvalue = random.choice(string.ascii_lowercase), offvalue = 0)
-c2 = Checkbutton(root, text='uppercase',variable = v, onvalue = random.choice(string.ascii_uppercase), offvalue = 0)
-c3 = Checkbutton(root, text='digits',variable = c, onvalue = random.choice(string.digits), offvalue = 0)
-c4 = Checkbutton(root, text='punctuation',variable = r, onvalue = random.choice(string.punctuation), offvalue = 0)
-z = Spinbox(root, from_=1, to=2048, textvariable = a)
-
-c1.pack()
-c2.pack()
-c3.pack()
-c4.pack()
+Checkbutton(tab2, text='lowercase', onvalue = 1, offvalue = 0, variable = t).pack()
+Checkbutton(tab2, text='uppercase', onvalue = 1, offvalue = 0, variable = v).pack()
+Checkbutton(tab2, text='digits', onvalue = 1, offvalue = 0, variable = c).pack()
+Checkbutton(tab2, text='punctuation', onvalue = 1, offvalue = 0, variable = r).pack()
+z = Spinbox(tab2, from_=1, to=2048)
 z.pack()
 
-lis = [t, v, c, r]
+w = Entry(tab1, width = 20)
+w2 = Entry(tab1, width = 20)
 
-if(t == 0 and v == 0 and c == 0 and r == 0):
-    print("Please select at least one character type")
+Label(tab1, text = "account").grid(column = 0, row = 0)
+Label(tab1, text = "password").grid(column = 1, row = 0)
 
-rr = []
+w.grid(column = 0, row = 1, padx = 10, pady = 5)
+w2.grid(column = 1, row = 1, padx = 10, pady = 5)
 
+def save_password():
+    f = open("passwords.psdw", "a")
+    f.write(w.get() + " " + w2.get() + "\n")
+    for _ in rrr:
+        if (_ not in save):
+            save.append(_)
+            Label(tab1, text = _, onclick = clipboard.copy(_)).grid(column = 1)
+
+Button(tab1, text = "Save Password", command = save_password).grid(column = 2, row = 1, padx = 10, pady = 30)
+
+for _ in rrr:
+        if (_ not in save):
+            save.append(_)
+            Label(tab1, text = _, onclick = clipboard.copy(_)).grid(column = 1)
 
 def get_random_string():
-#    return ''.join(random.choice(rr) for _ in range(a)) 
-    result = ""
-    i = 0
-    while(i < a):
-        if(t != 0):
-            rr.append(string.ascii_lowercase)
-        if(v != 0):
-            rr.append(string.ascii_uppercase)
+    a = int(z.get())
 
-        if(c != 0):
-            rr.append(string.digits)
+    if(t.get() == 1 and t.get() not in rr):
+        rr.append(string.ascii_lowercase)
+    if(v.get() == 1 and v.get() not in rr):
+        rr.append(string.ascii_uppercase)
+    if(c.get() == 1 and c.get() not in rr):
+        rr.append(string.digits)
+    if(r.get() == 1 and r.get() not in rr):
+        rr.append(string.punctuation)
+    if(t.get() == 0 and t.get() in rr):
+        rr.remove(string.ascii_lowercase)
+    if(v.get() == 0 and v.get() in rr):
+        rr.remove(string.ascii_uppercase)
+    if(c.get() == 0 and c.get() in rr):
+        rr.remove(string.digits)
+    if(r.get() == 0 and r.get() in rr):
+        rr.remove(string.punctuation)
 
-        if(r != 0):
-            rr.append(string.punctuation)
+    result = "".join(random.choice(random.choice(random.choice(rr))) for _ in range(a))
+    
+    finish = Label(tab2, text = result, onclick = clipboard.copy(result), bg = "gray")
+    finish.pack()
 
+    rr.clear()
 
-        i += 1
-
-        str = "".join(random.choice(rr) for _ in range(a))
-
-    if(i >= a):
-        for _ in range(a):
-            result = "".join(random.choice(str) for _ in range(a))
-            fresult = "".join(random.choice(result) for _ in range(a))
-            
-
-    print(fresult)
-
-Button(root, text = "Generate", command = get_random_string).pack()
+Button(tab2, text = "Generate", command = get_random_string).pack()
 
 root.mainloop()
